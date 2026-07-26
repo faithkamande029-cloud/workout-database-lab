@@ -61,3 +61,15 @@ class WorkoutSchema(Schema):
 
         if errors:
             raise ValidationError(errors)
+
+# Exercise schemas
+exercise_schema = ExerciseSchema()
+exercises_schema = ExerciseSchema(many=True)
+
+# Workout schemas
+workout_schema = WorkoutSchema()
+workouts_schema = WorkoutSchema(many=True)
+
+# WorkoutExercise schemas
+workout_exercise_schema = WorkoutExerciseSchema()
+workout_exercises_schema = WorkoutExerciseSchema(many=True)

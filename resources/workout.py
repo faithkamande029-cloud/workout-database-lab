@@ -1,5 +1,6 @@
 from flask import request, make_response
 from flask_restful import Resource
+from marshmallow import ValidationError
 
 from models import db, Workout
 from schemas import workout_schema, workouts_schema
@@ -12,22 +13,18 @@ class WorkoutsResource(Resource):
         return make_response(workouts_schema.dump(workouts), 200)
 
     def post(self):
-        data = request.get_json()
-
         try:
-            workout = Workout(
-                date=data["date"],
-                duration_minutes=data["duration_minutes"]
-            )
+            data = workout_schema.load(request.get_json())
+
+            workout = Workout(**data)
 
             db.session.add(workout)
             db.session.commit()
 
             return make_response(workout_schema.dump(workout), 201)
 
-        except Exception as e:
-            response = {"message": str(e)}
-            return make_response(response, 400)
+        except ValidationError as err:
+            return make_response(err.messages, 400)
 
 
 class WorkoutByID(Resource):
@@ -38,29 +35,32 @@ class WorkoutByID(Resource):
         if workout:
             return make_response(workout_schema.dump(workout), 200)
 
-        response = {"status": 404, "message": "Workout not found"}
-        return make_response(response, 404)
+        return make_response(
+            {"status": 404, "message": "Workout not found"},
+            404
+        )
 
     def patch(self, id):
         workout = Workout.query.filter_by(id=id).first()
 
         if not workout:
-            response = {"status": 404, "message": "Workout not found"}
-            return make_response(response, 404)
-
-        data = request.get_json()
+            return make_response(
+                {"status": 404, "message": "Workout not found"},
+                404
+            )
 
         try:
-            for attr in data:
-                setattr(workout, attr, data[attr])
+            data = workout_schema.load(request.get_json(), partial=True)
+
+            for key, value in data.items():
+                setattr(workout, key, value)
 
             db.session.commit()
 
             return make_response(workout_schema.dump(workout), 200)
 
-        except Exception as e:
-            response = {"message": str(e)}
-            return make_response(response, 400)
+        except ValidationError as err:
+            return make_response(err.messages, 400)
 
     def delete(self, id):
         workout = Workout.query.filter_by(id=id).first()
@@ -69,8 +69,12 @@ class WorkoutByID(Resource):
             db.session.delete(workout)
             db.session.commit()
 
-            response = {"message": "Workout deleted successfully"}
-            return make_response(response, 200)
+            return make_response(
+                {"message": "Workout deleted successfully"},
+                200
+            )
 
-        response = {"status": 404, "message": "Workout not found"}
-        return make_response(response, 404)
+        return make_response(
+            {"status": 404, "message": "Workout not found"},
+            404
+        )
