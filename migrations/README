@@ -1,1 +1,226 @@
-Single-database configuration for Flask.
+# Flask Workout Tracker API
+
+## Overview
+
+The Flask Workout Tracker API is a RESTful web application built with Flask, Flask-RESTful, SQLAlchemy, and Marshmallow. It allows users to create workouts, manage exercises, and associate exercises with workouts while recording workout details such as sets, repetitions, and duration.
+
+## Features
+
+* Create, view, update, and delete workouts.
+* Create, view, update, and delete exercises.
+* Associate exercises with workouts.
+* Store workout details including:
+
+  * Sets
+  * Repetitions
+  * Duration (seconds)
+* Data validation using Marshmallow schemas.
+* RESTful API endpoints.
+* Seed script for populating the database with sample data.
+
+## Technologies Used
+
+* Python 3
+* Flask
+* Flask-RESTful
+* Flask-SQLAlchemy
+* Flask-Migrate
+* Marshmallow
+* SQLite
+* Postman (API testing)
+
+## Project Structure
+
+```text
+flask-workout-app/
+│
+├── app.py
+├── models.py
+├── schemas.py
+├── seed.py
+├── resources/
+│   ├── exercise.py
+│   ├── workout.py
+│   └── workout_exercise.py
+├── migrations/
+└── instance/
+```
+
+## Installation
+
+1. Clone the repository.
+
+```bash
+git clone <repository-url>
+cd flask-workout-app
+```
+
+2. Create and activate a virtual environment.
+
+```bash
+pipenv shell
+```
+
+3. Install dependencies.
+
+```bash
+pip install -r requirements.txt
+```
+
+If you are using Pipenv:
+
+```bash
+pipenv install
+```
+
+## Database Setup
+
+Initialize the database (first time only):
+
+```bash
+flask db init
+```
+
+Create a migration:
+
+```bash
+flask db migrate -m "Initial migration"
+```
+
+Apply the migration:
+
+```bash
+flask db upgrade
+```
+
+Populate the database with sample data:
+
+```bash
+python seed.py
+```
+
+## Running the Application
+
+Start the development server.
+
+```bash
+flask run
+```
+
+The API will be available at:
+
+```
+http://127.0.0.1:5000
+```
+
+## API Endpoints
+
+### Workouts
+
+| Method | Endpoint         | Description         |
+| ------ | ---------------- | ------------------- |
+| GET    | `/workouts`      | Get all workouts    |
+| GET    | `/workouts/<id>` | Get a workout by ID |
+| POST   | `/workouts`      | Create a workout    |
+| PATCH  | `/workouts/<id>` | Update a workout    |
+| DELETE | `/workouts/<id>` | Delete a workout    |
+
+### Exercises
+
+| Method | Endpoint          | Description           |
+| ------ | ----------------- | --------------------- |
+| GET    | `/exercises`      | Get all exercises     |
+| GET    | `/exercises/<id>` | Get an exercise by ID |
+| POST   | `/exercises`      | Create an exercise    |
+| PATCH  | `/exercises/<id>` | Update an exercise    |
+| DELETE | `/exercises/<id>` | Delete an exercise    |
+
+### Workout Exercises
+
+| Method | Endpoint                                                           | Description                  |
+| ------ | ------------------------------------------------------------------ | ---------------------------- |
+| POST   | `/workouts/<workout_id>/exercises/<exercise_id>/workout_exercises` | Add an exercise to a workout |
+
+## Example Requests
+
+### Create an Exercise
+
+**POST** `/exercises`
+
+```json
+{
+    "name": "Push Up",
+    "category": "Strength",
+    "equipment": false
+}
+```
+
+### Create a Workout
+
+**POST** `/workouts`
+
+```json
+{
+    "date": "2026-07-27",
+    "duration_minutes": 45
+}
+```
+
+### Add an Exercise to a Workout
+
+**POST** `/workouts/1/exercises/2/workout_exercises`
+
+```json
+{
+    "reps": 12,
+    "sets": 3
+}
+```
+
+or
+
+```json
+{
+    "duration_seconds": 600
+}
+```
+
+## Validation
+
+The application uses Marshmallow schemas to validate incoming request data.
+
+Examples include:
+
+* Exercise names cannot be empty.
+* Exercise categories must be valid.
+* Workout duration must be greater than zero.
+* A workout exercise requires either repetitions or a duration.
+
+## Testing
+
+The API was tested using Postman.
+
+Example endpoints:
+
+* `GET /workouts`
+* `POST /workouts`
+* `GET /exercises`
+* `POST /exercises`
+* `POST /workouts/<workout_id>/exercises/<exercise_id>/workout_exercises`
+
+## Future Improvements
+
+* User authentication and authorization.
+* Search and filtering.
+* Pagination.
+* Workout statistics and analytics.
+* Exercise history.
+* Automated unit and integration tests.
+
+## Author
+
+Faith
+
+## License
+
+This project is intended for educational purposes.
